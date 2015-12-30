@@ -18,7 +18,7 @@
 
 #include <inttypes.h>
 #include "Print.h"
-#include <Adafruit_TinyMCP23017.h>
+#include "Adafruit_TinyMCP23017.h"
 
 // commands
 #define LCD_CLEARDISPLAY 0x01
