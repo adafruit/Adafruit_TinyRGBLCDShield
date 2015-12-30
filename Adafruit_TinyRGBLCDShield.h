@@ -106,8 +106,7 @@ public:
 
 private:
   void send(uint8_t, uint8_t);
-  void write4bits(uint8_t);
-  void write8bits(uint8_t);
+  void writeBits(uint8_t, uint8_t);
   void pulseEnable();
   void _digitalWrite(uint8_t, uint8_t);
   void _pinMode(uint8_t, uint8_t);
@@ -128,5 +127,8 @@ private:
   uint8_t _i2cAddr;
   Adafruit_TinyMCP23017 _i2c;
 };
+
+#define write4bits(b) writeBits(b, 4)
+#define write8bits(b) writeBits(b, 8)
 
 #endif

@@ -55,6 +55,7 @@ Adafruit_TinyRGBLCDShield::Adafruit_TinyRGBLCDShield() {
   _rs_pin = 15;
   _rw_pin = 14;
   _enable_pin = 13;
+
   _data_pins[0] = 12;  // really d4
   _data_pins[1] = 11;  // really d5
   _data_pins[2] = 10;  // really d6
@@ -123,10 +124,9 @@ void Adafruit_TinyRGBLCDShield::begin(uint8_t cols, uint8_t lines, uint8_t dotsi
 
     _i2c.pinMode(_rs_pin, OUTPUT);
     _i2c.pinMode(_enable_pin, OUTPUT);
-    for (uint8_t i=0; i<4; i++) 
-      _i2c.pinMode(_data_pins[i], OUTPUT);
 
     for (uint8_t i=0; i<5; i++) {
+      _i2c.pinMode(_data_pins[i & 0x4], OUTPUT);
       _i2c.pinMode(_button_pins[i], INPUT);
       _i2c.pullUp(_button_pins[i], 1);
     }
@@ -377,8 +377,8 @@ void Adafruit_TinyRGBLCDShield::pulseEnable(void) {
   delayMicroseconds(100);   // commands need > 37us to settle
 }
 
-void Adafruit_TinyRGBLCDShield::write4bits(uint8_t value) {
-  if (_i2cAddr != 255) {
+void Adafruit_TinyRGBLCDShield::writeBits(uint8_t value, uint8_t length) {
+  if (length < 8 && _i2cAddr != 255) {
     uint16_t out = 0;
 
     out = _i2c.readGPIOAB();
@@ -404,21 +404,12 @@ void Adafruit_TinyRGBLCDShield::write4bits(uint8_t value) {
     delayMicroseconds(100);
 
   } else {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < length; i++) {
      _pinMode(_data_pins[i], OUTPUT);
      _digitalWrite(_data_pins[i], (value >> i) & 0x01);
     }
     pulseEnable();
   }
-}
-
-void Adafruit_TinyRGBLCDShield::write8bits(uint8_t value) {
-  for (int i = 0; i < 8; i++) {
-    _pinMode(_data_pins[i], OUTPUT);
-    _digitalWrite(_data_pins[i], (value >> i) & 0x01);
-  }
-  
-  pulseEnable();
 }
 
 uint8_t Adafruit_TinyRGBLCDShield::readButtons(void) {
