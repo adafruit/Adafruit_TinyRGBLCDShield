@@ -1,13 +1,13 @@
-/*************************************************** 
+/***************************************************
   This is a library for the MCP23017 i2c port expander
 
-  These displays use I2C to communicate, 2 pins are required to  
+  These displays use I2C to communicate, 2 pins are required to
   interface
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -16,12 +16,12 @@
 #include "Adafruit_TinyMCP23017.h"
 
 #if ARDUINO >= 100
- #include "Arduino.h"
+  #include "Arduino.h"
 #else
- #include "WProgram.h"
+  #include "WProgram.h"
 #endif
 
-// minihelper
+ // minihelper
 static inline void wiresend(uint8_t x) {
 #if ARDUINO >= 100
   TinyWireM.write((uint8_t)x);
@@ -45,14 +45,14 @@ void Adafruit_TinyMCP23017::begin(uint8_t addr) {
   i2caddr = MCP23017_ADDRESS | addr;
 
   TinyWireM.begin();
-  
+
   // set defaults! IODIRB is 1 greater than IODIRA
   for (uint8_t port = 0; port < 2; port++)
   {
-	  TinyWireM.beginTransmission(i2caddr);
-	  wiresend(MCP23017_IODIRA + port);
-	  wiresend(0xFF);
-	  TinyWireM.endTransmission();
+    TinyWireM.beginTransmission(i2caddr);
+    wiresend(MCP23017_IODIRA + port);
+    wiresend(0xFF);
+    TinyWireM.endTransmission();
   }
 }
 
@@ -74,23 +74,24 @@ void Adafruit_TinyMCP23017::pinMode(uint8_t p, uint8_t d) {
 
   // read the current IODIR
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(iodiraddr);	
+  wiresend(iodiraddr);
   TinyWireM.endTransmission();
-  
+
   TinyWireM.requestFrom(i2caddr, 1);
   iodir = wirerecv();
 
   // set the pin and direction
   if (d == INPUT) {
-    iodir |= 1 << p; 
-  } else {
+    iodir |= 1 << p;
+  }
+  else {
     iodir &= ~(1 << p);
   }
 
   // write the new IODIR
   TinyWireM.beginTransmission(i2caddr);
   wiresend(iodiraddr);
-  wiresend(iodir);	
+  wiresend(iodir);
   TinyWireM.endTransmission();
 }
 
@@ -100,9 +101,9 @@ uint16_t Adafruit_TinyMCP23017::readGPIOAB() {
 
   // read the current GPIO output latches
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(MCP23017_GPIOA);	
+  wiresend(MCP23017_GPIOA);
   TinyWireM.endTransmission();
-  
+
   TinyWireM.requestFrom(i2caddr, 2);
   a = wirerecv();
   ba = wirerecv();
@@ -114,51 +115,53 @@ uint16_t Adafruit_TinyMCP23017::readGPIOAB() {
 
 void Adafruit_TinyMCP23017::writeGPIOAB(uint16_t ba) {
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(MCP23017_GPIOA);	
+  wiresend(MCP23017_GPIOA);
   wiresend(ba & 0xFF);
   wiresend(ba >> 8);
   TinyWireM.endTransmission();
 }
 
-void Adafruit_TinyMCP23017::digitalWrite(uint8_t p, uint8_t d) {
+void Adafruit_TinyMCP23017::digitalWrite(uint8_t pin, uint8_t direction) {
   uint8_t gpio;
   uint8_t gpioaddr, olataddr;
 
   olataddr = MCP23017_OLATA;
-  if (p >= 8) {
-	olataddr = MCP23017_OLATB;
-	p -= 8;
+  if (pin >= 8) {
+    olataddr = MCP23017_OLATB;
+    pin -= 8;
   }
   gpioaddr = olataddr - 2;
 
   // read the current GPIO output latches
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(olataddr);	
+  wiresend(olataddr);
   TinyWireM.endTransmission();
-  
+
   TinyWireM.requestFrom(i2caddr, 1);
-   gpio = wirerecv();
+  gpio = wirerecv();
 
   // set the pin and direction
-  if (d == HIGH) {
-    gpio |= 1 << p; 
-  } else {
-    gpio &= ~(1 << p);
+  if (direction == HIGH) {
+    gpio |= 1 << pin;
+  }
+  else {
+    gpio &= ~(1 << pin);
   }
 
   // write the new GPIO
   TinyWireM.beginTransmission(i2caddr);
   wiresend(gpioaddr);
-  wiresend(gpio);	
+  wiresend(gpio);
   TinyWireM.endTransmission();
 }
 
-void Adafruit_TinyMCP23017::pullUp(uint8_t p, uint8_t d) {
+void Adafruit_TinyMCP23017::pullUp(uint8_t p, uint8_t direction) {
   uint8_t gppu;
   uint8_t gppuaddr;
 
-  if (p < 8)
+  if (p < 8) {
     gppuaddr = MCP23017_GPPUA;
+  }
   else {
     gppuaddr = MCP23017_GPPUB;
     p -= 8;
@@ -167,23 +170,24 @@ void Adafruit_TinyMCP23017::pullUp(uint8_t p, uint8_t d) {
 
   // read the current pullup resistor set
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(gppuaddr);	
+  wiresend(gppuaddr);
   TinyWireM.endTransmission();
-  
+
   TinyWireM.requestFrom(i2caddr, 1);
   gppu = wirerecv();
 
   // set the pin and direction
-  if (d == HIGH) {
-    gppu |= 1 << p; 
-  } else {
+  if (direction == HIGH) {
+    gppu |= 1 << p;
+  }
+  else {
     gppu &= ~(1 << p);
   }
 
   // write the new GPIO
   TinyWireM.beginTransmission(i2caddr);
   wiresend(gppuaddr);
-  wiresend(gppu);	
+  wiresend(gppu);
   TinyWireM.endTransmission();
 }
 
@@ -191,7 +195,9 @@ uint8_t Adafruit_TinyMCP23017::digitalRead(uint8_t p) {
   uint8_t gpioaddr;
 
   if (p < 8)
+  {
     gpioaddr = MCP23017_GPIOA;
+  }
   else {
     gpioaddr = MCP23017_GPIOB;
     p -= 8;
@@ -199,9 +205,9 @@ uint8_t Adafruit_TinyMCP23017::digitalRead(uint8_t p) {
 
   // read the current GPIO
   TinyWireM.beginTransmission(i2caddr);
-  wiresend(gpioaddr);	
+  wiresend(gpioaddr);
   TinyWireM.endTransmission();
-  
+
   TinyWireM.requestFrom(i2caddr, 1);
   return (wirerecv() >> p) & 0x1;
 }
