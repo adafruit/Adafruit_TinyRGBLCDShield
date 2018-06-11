@@ -18,8 +18,9 @@
 
 #include <inttypes.h>
 #include "Print.h"
-#include <Adafruit_TinyMCP23017.h>
+#include "Adafruit_TinyMCP23017.h"
 
+//#define LCD_RW
 // commands
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -95,20 +96,19 @@ public:
   void setBacklight(uint8_t status); 
 
   void createChar(uint8_t, uint8_t[]);
-  void setCursor(uint8_t, uint8_t); 
+  void setCursor(uint8_t, uint8_t);
+  void command(uint8_t);
+  uint8_t readButtons();
+
 #if ARDUINO >= 100
   virtual size_t write(uint8_t);
 #else
   virtual void write(uint8_t);
 #endif
-  void command(uint8_t);
-  uint8_t readButtons();
 
 private:
   void send(uint8_t, uint8_t);
-  void write4bits(uint8_t);
-  void write8bits(uint8_t);
-  void pulseEnable();
+  void writeBits(uint8_t);
   void _digitalWrite(uint8_t, uint8_t);
   void _pinMode(uint8_t, uint8_t);
 
