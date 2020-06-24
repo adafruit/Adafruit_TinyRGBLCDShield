@@ -5,6 +5,7 @@
 #include "Adafruit_TinyMCP23017.h"
 #include <TinyWireM.h>
 #include <avr/pgmspace.h>
+#include <stdint.h>
 
 #if ARDUINO >= 100
 #include "Arduino.h"
