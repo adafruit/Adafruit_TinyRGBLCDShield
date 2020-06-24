@@ -2,7 +2,6 @@
  * @file Adafruit_TinyMCP23017.cpp
  */
 
-#include <stdint.h>
 #include "Adafruit_TinyMCP23017.h"
 #include <TinyWireM.h>
 #include <avr/pgmspace.h>

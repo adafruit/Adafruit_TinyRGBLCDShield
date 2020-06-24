@@ -5,6 +5,8 @@
 #ifndef _Adafruit_TinyMCP23017_H_
 #define _Adafruit_TinyMCP23017_H_
 
+#include <stdint.h>
+
 // Don't forget the Wire library
 /*!
  * @brief MCP23017 main class
